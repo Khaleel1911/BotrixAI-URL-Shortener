@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+@theme {
+  --color-teal: #0ea5a4;
+  --color-teal-dark: #0b8e8d;
+}
+
+*{
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
