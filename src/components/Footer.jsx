@@ -10,7 +10,7 @@ const Footer = () => {
   };
 
   return (
-    <footer className="bg-teal text-white py-14 px-7 font-sans antialiased" role="contentinfo">
+    <footer className="bg-teal-600 dark:bg-bg-primary-dark text-white py-14 px-7 font-sans antialiased" role="contentinfo">
       <div className="max-w-[1200px] mx-auto">
         {/* TOP ROW: Quick Links (left), HERO (center), Features (right) */}
         <div className="flex flex-wrap gap-10 items-start pb-7 max-md:flex-col max-md:gap-8">
@@ -20,8 +20,8 @@ const Footer = () => {
             <nav aria-label="Quick links">
               <ul className="list-none p-0 m-0">
                 <li className="my-3.5">
-                  <a 
-                    href="#home" 
+                  <a
+                    href="#home"
                     className="text-white no-underline font-medium transition-all hover:text-white/80"
                     aria-label="Navigate to home section"
                   >
@@ -29,8 +29,8 @@ const Footer = () => {
                   </a>
                 </li>
                 <li className="my-3.5">
-                  <a 
-                    href="#features" 
+                  <a
+                    href="#features"
                     className="text-white no-underline font-medium transition-all hover:text-white/80"
                     aria-label="Navigate to features section"
                   >
@@ -38,8 +38,8 @@ const Footer = () => {
                   </a>
                 </li>
                 <li className="my-3.5">
-                  <a 
-                    href="#implementation" 
+                  <a
+                    href="#implementation"
                     className="text-white no-underline font-medium transition-all hover:text-white/80"
                     aria-label="Navigate to implementation section"
                   >
@@ -61,8 +61,8 @@ const Footer = () => {
             </p>
 
             <div className="text-center">
-              <button 
-                className="bg-white text-teal py-4 px-10 rounded-2xl border-0 cursor-pointer font-bold text-lg shadow-[0_8px_24px_rgba(0,0,0,0.14)] transition-all hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(0,0,0,0.18)] focus:outline-3 focus:outline-white/15 focus:outline-offset-3" 
+              <button
+                className="bg-btn-primary text-black py-4 px-10 rounded-2xl border-0 cursor-pointer font-bold text-md shadow-[0_8px_24px_rgba(0,0,0,0.14)] transition-all hover:-translate-y-1 hover:shadow-[0_12px_30px_rgba(0,0,0,0.18)] focus:outline-3 focus:outline-white/15 focus:outline-offset-3"
                 type="button"
                 onClick={handleGetStarted}
                 aria-label="Get started with URL shortener"
@@ -79,8 +79,8 @@ const Footer = () => {
             <nav aria-label="Features">
               <ul className="list-none p-0 m-0">
                 <li className="my-3.5">
-                  <a 
-                    href="#shorten" 
+                  <a
+                    href="#features"
                     className="text-white no-underline font-medium transition-all hover:text-white/80"
                     aria-label="Learn about shorten feature"
                   >
@@ -88,8 +88,8 @@ const Footer = () => {
                   </a>
                 </li>
                 <li className="my-3.5">
-                  <a 
-                    href="#validity" 
+                  <a
+                    href="#features"
                     className="text-white no-underline font-medium transition-all hover:text-white/80"
                     aria-label="Learn about validity feature"
                   >
@@ -97,8 +97,8 @@ const Footer = () => {
                   </a>
                 </li>
                 <li className="my-3.5">
-                  <a 
-                    href="#scanner" 
+                  <a
+                    href="#features"
                     className="text-white no-underline font-medium transition-all hover:text-white/80"
                     aria-label="Learn about scanner feature"
                   >
@@ -111,7 +111,7 @@ const Footer = () => {
         </div>
 
         {/* Divider */}
-        <div className="h-px bg-white/6 mx-auto max-w-[1200px] my-2.5" />
+        <div className="h-px bg-white/6 mx-auto max-w-[1200px] " />
 
         {/* BOTTOM ROW: left text, centered icons, right text */}
         <div className="max-w-[1200px] mx-auto mt-4.5 pt-2 flex flex-wrap items-center justify-between gap-4 max-md:flex-col max-md:gap-4 max-md:text-center">
@@ -120,33 +120,32 @@ const Footer = () => {
           </p>
 
           <div className="flex gap-6 items-center justify-center order-2 max-md:order-1" role="navigation" aria-label="Social media links">
-            <a 
-              aria-label="Visit our Facebook page" 
-              href="https://facebook.com" 
-              target="_blank" 
-              rel="noreferrer" 
+            <a
+              aria-label="Visit our Facebook page"
+              href="https://www.facebook.com/people/Botrixai/61577767733320/#"
+              target="_blank"
+              rel="noreferrer"
               className="inline-flex items-center justify-center w-10 h-10 text-white transition-all hover:text-white/80 hover:scale-110 no-underline"
               tabIndex={0}
             >
               <FaFacebookF size={20} aria-hidden="true" />
             </a>
 
-            <a 
-              aria-label="Visit our Instagram page" 
-              href="https://instagram.com" 
-              target="_blank" 
-              rel="noreferrer" 
+            <a
+              aria-label="Visit our Instagram page"
+              href="https://www.instagram.com/botrixai/"
+              target="_blank"
+              rel="noreferrer"
               className="inline-flex items-center justify-center w-10 h-10 text-white transition-all hover:text-white/80 hover:scale-110 no-underline"
               tabIndex={0}
             >
               <FaInstagram size={20} aria-hidden="true" />
             </a>
 
-            <a 
-              aria-label="Visit our WhatsApp" 
-              href="https://whatsapp.com" 
-              target="_blank" 
-              rel="noreferrer" 
+            <a
+              aria-label="Visit our WhatsApp"
+              href="https://wa.me/917294878246?text=Hello%20I%20want%20a%20demo" target="_blank"
+              rel="noreferrer"
               className="inline-flex items-center justify-center w-10 h-10 text-white transition-all hover:text-white/80 hover:scale-110 no-underline"
               tabIndex={0}
             >
@@ -156,10 +155,10 @@ const Footer = () => {
 
           <p className="m-0 text-white/70 font-normal text-sm order-3 max-md:order-2">
             Powered by{' '}
-            <a 
-              href="https://botrix.ai" 
-              target="_blank" 
-              rel="noreferrer" 
+            <a
+              href="https://botrixai.com/"
+              target="_blank"
+              rel="noreferrer"
               className="font-bold text-white hover:text-white/90 no-underline"
               aria-label="Visit BotrixAI website"
             >

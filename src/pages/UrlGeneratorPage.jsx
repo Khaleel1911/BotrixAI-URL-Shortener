@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
-import { Footer } from '../components/layout';
-import { botrixLogo } from '../constants/images';
-import { FaCopy, FaHistory } from 'react-icons/fa';
+import React, { useState ,useEffect} from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FaCopy, FaHistory, FaSignOutAlt, FaUser } from 'react-icons/fa';
+import  BotrixAI_Light  from "../assets/BotrixAI_Light.avif";
+import  BotrixAI_Dark  from "../assets/BotrixAI_Dark.avif";
+import api from "../api/axios";
 
 const UrlGeneratorPage = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     longLink: '',
     customCode: '',
@@ -35,90 +38,89 @@ const UrlGeneratorPage = () => {
     return diffDays > 0 ? diffDays : null;
   };
 
+  useEffect(() => {
+    const saved = sessionStorage.getItem("lastGeneratedUrl");
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      setGeneratedUrl(parsed.shortUrl);
+      setQrCodeBase64(parsed.qrCodeBase64);
+      if (parsed.expiryInfo) {
+        setExpiryInfo({ rawDate: parsed.expiryInfo });
+      }
+    }
+  }, []);
+  
+
   const handleGenerate = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setIsLoading(true);
-    
+  
     if (!formData.longLink) {
-      setError('Please enter a long link');
+      setError("Please enter a long link");
       setIsLoading(false);
       return;
     }
-
+  
     try {
-      // Prepare request body
       const requestBody = {
         url: formData.longLink,
       };
-
-      // Add custom code if provided
-      if (formData.customCode.trim()) {
+  
+      if (formData.customCode?.trim()) {
         requestBody.customCode = formData.customCode.trim();
       }
-
-      // Calculate expiry days if date is provided
+  
       const expiryDays = calculateExpiryDays(formData.expiryDate);
-      if (expiryDays !== null && expiryDays > 0) {
+      if (expiryDays && expiryDays > 0) {
         requestBody.expiryDays = expiryDays;
       }
-
-      // Make API call
-      const response = await fetch('http://localhost:8081/api/shorten', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody),
-      });
-
-      if (!response.ok) {
-        let errorMessage = `Error: ${response.status} ${response.statusText}`;
-        try {
-          const errorData = await response.json();
-          // Use the message from the API response if available
-          if (errorData.message) {
-            errorMessage = errorData.message;
-          }
-        } catch (parseError) {
-          // If JSON parsing fails, use the default error message
-          console.error('Failed to parse error response:', parseError);
-        }
-        throw new Error(errorMessage);
-      }
-
-      const data = await response.json();
-
-      // Set generated URL
+  
+      // ✅ JWT automatically attached via axios interceptor
+      const { data } = await api.post("/api/shorten", requestBody);
+  
       setGeneratedUrl(data.shortUrl);
-
-      // Set QR code
+  
       if (data.qrCodeBase64) {
         setQrCodeBase64(data.qrCodeBase64);
       }
-
-      // Set expiry info
+  
       if (data.expiryDate) {
-        const expiryDate = new Date(data.expiryDate);
+        const expiry = new Date(data.expiryDate);
         setExpiryInfo({
-          date: expiryDate.toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
+          date: expiry.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
           }),
-          time: expiryDate.toLocaleTimeString('en-US', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
+          time: expiry.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
           }),
           rawDate: data.expiryDate,
         });
       } else {
         setExpiryInfo(null);
       }
+
+      const generatedData = {
+        shortUrl: data.shortUrl,
+        qrCodeBase64: data.qrCodeBase64,
+        expiryInfo: data.expiryDate
+      };
+      
+      sessionStorage.setItem("lastGeneratedUrl", JSON.stringify(generatedData));
+      
+  
     } catch (err) {
-      setError(err.message || 'Failed to generate short URL. Please try again.');
-      setGeneratedUrl('');
-      setQrCodeBase64('');
+      const message =
+        err.response?.data?.message ||
+        err.message ||
+        "Failed to generate short URL";
+  
+      setError(message);
+      setGeneratedUrl("");
+      setQrCodeBase64("");
       setExpiryInfo(null);
     } finally {
       setIsLoading(false);
@@ -137,22 +139,28 @@ const UrlGeneratorPage = () => {
 
   const handleHistory = () => {
     console.log('History clicked');
+    navigate("/history");
     // Will implement history page later
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/", { replace: true });
+  };
+  
+
   return (
     <>
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-bg-primary-light dark:bg-bg-primary-dark dark:text-dark-text">
         {/* Page Header */}
-        <div className="bg-white border-b border-gray-200">
+        
+        
+        <div className="bg-bg-primary-light dark:bg-bg-primary-dark  border-gray-200">
           <div className="max-w-[1200px] mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <img
-                src={botrixLogo}
-                alt="BotrixAI Logo"
-                className="h-18 w-auto"
-                aria-hidden="true"
-              />
+              <img src={BotrixAI_Light} className="h-16 w-auto dark:hidden"/>
+              <img src={BotrixAI_Dark} className="h-16 w-auto hidden dark:block"/>
+
             </div>
             <div className="flex items-center gap-4">
               <button
@@ -164,9 +172,22 @@ const UrlGeneratorPage = () => {
               >
                 <FaHistory size={20} className="text-gray-700" aria-hidden="true" />
               </button>
-              <div className="w-10 h-10 bg-teal rounded-full flex items-center justify-center text-white font-semibold">
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors"
+                aria-label="Logout"
+                tabIndex={0}
+              >
+                <FaSignOutAlt size={20} className="text-gray-700" aria-hidden="true" />
+              </button>
+              {/* <div className="w-10 h-10 bg-teal rounded-full flex items-center justify-center text-white font-semibold">
                 M
-              </div>
+              </div> */}
+              <button onClick={() => navigate("/profile")}>
+              <FaUser size={20} className="text-gray-700" aria-hidden="true" /> 
+            </button>
+
             </div>
           </div>
         </div>
@@ -174,8 +195,7 @@ const UrlGeneratorPage = () => {
         {/* Main Content */}
         <div className="max-w-[800px] mx-auto px-4 sm:px-6 py-12">
           <h1 className="text-3xl sm:text-4xl font-bold mb-8">
-            <span className="text-teal">Short URL</span>{' '}
-            <span className="text-gray-800">Generator</span>
+            <span className="text-teal">Short URL Generator</span>
           </h1>
 
           <form onSubmit={handleGenerate} className="space-y-6">
@@ -188,7 +208,7 @@ const UrlGeneratorPage = () => {
                 value={formData.longLink}
                 onChange={handleInputChange}
                 required
-                className="w-full h-14 px-4 border border-gray-300 rounded-lg text-base outline-none bg-white text-gray-900 placeholder:text-gray-400 focus:border-teal focus:ring-2 focus:ring-teal/20 transition-all"
+                className="w-full h-14 px-4 border border-gray-300 rounded-lg text-base outline-none bg-bg-primary-light dark:bg-bg-primary-dark text-gray-400 placeholder:text-gray-400 focus:border-teal focus:ring-2 focus:ring-teal/20 transition-all"
                 placeholder="Enter the Link"
                 aria-label="Enter long URL to shorten"
               />
@@ -202,7 +222,7 @@ const UrlGeneratorPage = () => {
                 type="text"
                 value={formData.customCode}
                 onChange={handleInputChange}
-                className="w-full h-14 px-4 border border-gray-300 rounded-lg text-base outline-none bg-white text-gray-900 placeholder:text-gray-400 focus:border-teal focus:ring-2 focus:ring-teal/20 transition-all"
+                className="w-full h-14 px-4 border border-gray-300 rounded-lg text-base outline-none bg-bg-primary-light dark:bg-bg-primary-dark text-gray-400 placeholder:text-gray-400 focus:border-teal focus:ring-2 focus:ring-teal/20 transition-all"
                 placeholder="Custom Code (Optional)"
                 aria-label="Enter custom code for URL"
                 pattern="[A-Za-z0-9_-]+"
@@ -219,7 +239,7 @@ const UrlGeneratorPage = () => {
                 value={formData.expiryDate}
                 onChange={handleInputChange}
                 min={new Date().toISOString().split('T')[0]}
-                className="w-full h-14 px-4 border border-gray-300 rounded-lg text-base outline-none bg-white text-gray-900 focus:border-teal focus:ring-2 focus:ring-teal/20 transition-all"
+                className="w-full h-14 px-4 border border-gray-300 rounded-lg text-base outline-none bg-bg-primary-light dark:bg-bg-primary-dark  text-gray-400 focus:border-teal focus:ring-2 focus:ring-teal/20 transition-all"
                 aria-label="Select expiry date"
                 placeholder="Expiry Date (Optional)"
               />
@@ -236,7 +256,7 @@ const UrlGeneratorPage = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className={`w-full h-14 bg-teal text-white font-semibold text-lg rounded-lg border-none cursor-pointer shadow-[0_6px_18px_rgba(14,165,164,0.35)] transition-all hover:bg-teal-dark hover:shadow-[0_8px_22px_rgba(14,165,164,0.40)] hover:-translate-y-px focus:outline-none focus:ring-2 focus:ring-teal focus:ring-offset-2 ${
+              className={`w-full h-14 bg-teal-500 text-white font-semibold text-lg rounded-lg border-none cursor-pointer shadow-[0_6px_18px_rgba(14,165,164,0.35)] transition-all hover:bg-teal-dark hover:shadow-[0_8px_22px_rgba(14,165,164,0.40)] hover:-translate-y-px focus:outline-none focus:ring-2 focus:ring-teal focus:ring-offset-2 ${
                 isLoading ? 'opacity-70 cursor-not-allowed' : ''
               }`}
               aria-label="Generate short URL"
@@ -250,8 +270,8 @@ const UrlGeneratorPage = () => {
           {generatedUrl && (
             <div className="mt-8 space-y-4">
               {/* Generated URL with Copy */}
-              <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              <div className="bg-bg-primary-light dark:bg-bg-primary-dark border border-gray-200 rounded-lg p-6 shadow-sm">
+                <label className="block text-sm font-medium dark:text-gray-300  mb-2">
                   Generated Short URL
                 </label>
                 <div className="flex items-center gap-3">
@@ -259,16 +279,16 @@ const UrlGeneratorPage = () => {
                     type="text"
                     value={generatedUrl}
                     readOnly
-                    className="flex-1 h-12 px-4 border border-gray-300 rounded-lg text-base bg-gray-50 text-gray-700 outline-none"
+                    className="flex-1 h-12 px-4 border border-gray-300 rounded-lg text-base bg-bg-primary-light dark:bg-bg-primary-dark text-blue-500 outline-none"
                     aria-label="Generated short URL"
                   />
                   <button
                     type="button"
                     onClick={handleCopyToClipboard}
-                    className={`h-12 px-6 flex items-center gap-2 rounded-lg font-medium transition-all ${
+                    className={`h-12 px-6 flex items-center gap-2 border border-gray-300 cursor-pointer rounded-lg font-medium transition-all ${
                       copied
                         ? 'bg-green-500 text-white'
-                        : 'bg-teal text-white hover:bg-teal-dark'
+                        : 'bg-teal-500 text-white hover:bg-teal-dark'
                     }`}
                     aria-label="Copy URL to clipboard"
                     tabIndex={0}
@@ -281,8 +301,8 @@ const UrlGeneratorPage = () => {
 
               {/* QR Code */}
               {qrCodeBase64 && (
-                <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
-                  <h3 className="text-sm font-medium text-gray-700 mb-4">
+                <div className="bg-bg-primary-light dark:bg-bg-primary-dark border border-gray-200 rounded-lg p-6 shadow-sm">
+                  <h3 className="text-sm font-medium dark:text-gray-300 mb-4">
                     QR Code
                   </h3>
                   <div className="flex justify-center">
@@ -298,7 +318,7 @@ const UrlGeneratorPage = () => {
 
               {/* Expiry Information */}
               {expiryInfo && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                <div className="bg-blue-50 dark:bg-bg-primary-dark border border-blue-200 rounded-lg p-6">
                   <h3 className="text-lg font-semibold text-blue-900 mb-2">
                     Link Expiry Information
                   </h3>
@@ -321,7 +341,7 @@ const UrlGeneratorPage = () => {
           )}
         </div>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 };

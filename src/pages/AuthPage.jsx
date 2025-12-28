@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState ,useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Header, Footer } from '../components/layout';
-import { botrixLogo } from '../constants/images';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+import  BotrixAI_Light  from "../assets/BotrixAI_Light.avif";
+import  BotrixAI_Dark  from "../assets/BotrixAI_Dark.avif";
+import { login, register } from "../api/authService";
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -31,22 +34,40 @@ const AuthPage = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isLogin) {
-      console.log('Login:', formData);
-      // Navigate to home after login
-      navigate('/');
-    } else {
-      if (formData.password !== formData.confirmPassword) {
-        alert('Passwords do not match');
-        return;
+  
+    try {
+      if (isLogin) {
+        const res = await login({
+          email: formData.email,
+          password: formData.password,
+        });
+  
+        localStorage.setItem("token", res.data.token);
+        navigate("/generate", { replace: true });
+      } else {
+        if (formData.password !== formData.confirmPassword) {
+          alert("Passwords do not match");
+          return;
+        }
+  
+        const res = await register({
+          email: formData.email,
+          password: formData.password,
+        });
+  
+        localStorage.setItem("token", res.data.token);
+        navigate("/generate", { replace: true });
       }
-      console.log('Signup:', formData);
-      // Navigate to home after signup
-      navigate('/');
+    } catch (err) {
+      alert(
+        err.response?.data?.message ||
+        "Authentication failed. Please try again."
+      );
     }
   };
+  
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -55,31 +76,35 @@ const AuthPage = () => {
     }
   };
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/generate", { replace: true });
+    }
+  }, []);
+
   return (
     <>
-      <Header />
-      <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4">
+
+      <div className="min-h-screen bg-bg-primary-light dark:bg-bg-primary-dark flex items-center justify-center py-12 px-4">
         <div className="max-w-[500px] w-full">
           {/* Logo */}
           <div className="flex justify-center mb-8">
-            <img
-              src={botrixLogo}
-              alt="BotrixAI Logo"
-              className="h-16 w-auto"
-              aria-hidden="true"
-            />
+          <img src={BotrixAI_Light} className="h-16 w-auto dark:hidden"/>
+          <img src={BotrixAI_Dark} className="h-16 w-auto hidden dark:block"/>
+
           </div>
 
           {/* Toggle Buttons */}
-          <div className="flex gap-4 mb-8 bg-gray-100 p-1 rounded-xl">
+          <div className="flex gap-4 mb-8 bg-bg-primary-light dark:bg-bg-primary-dark p-1 rounded-xl dark:shadow-md dark:shadow-gray-700">
             <button
               type="button"
               onClick={handleToggleMode}
               onKeyDown={handleKeyDown}
-              className={`flex-1 py-3 px-4 rounded-lg font-semibold text-base transition-all duration-200 ${
+              className={`flex-1 py-3 px-4 rounded-lg font-semibold text-base transition-all duration-200 cursor-pointer ${
                 isLogin
-                  ? 'bg-teal text-white shadow-md'
-                  : 'bg-transparent text-gray-600 hover:text-gray-900'
+                  ? 'bg-teal-500 text-white shadow-md'
+                  : 'bg-transparent text-black dark:text-dark-text'
               }`}
               aria-label={isLogin ? 'Currently on login mode' : 'Switch to login mode'}
               tabIndex={0}
@@ -90,10 +115,10 @@ const AuthPage = () => {
               type="button"
               onClick={handleToggleMode}
               onKeyDown={handleKeyDown}
-              className={`flex-1 py-3 px-4 rounded-lg font-semibold text-base transition-all duration-200 ${
+              className={`flex-1 py-3 px-4 rounded-lg font-semibold text-base transition-all duration-200  cursor-pointer ${
                 !isLogin
-                  ? 'bg-teal text-white shadow-md'
-                  : 'bg-transparent text-gray-600 hover:text-gray-900'
+                  ? 'bg-teal-500 text-white shadow-md'
+                  : 'bg-transparent text-black dark:text-dark-text '
               }`}
               aria-label={!isLogin ? 'Currently on signup mode' : 'Switch to signup mode'}
               tabIndex={0}
@@ -103,12 +128,12 @@ const AuthPage = () => {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5 text-gray-900 dark:text-dark-text">
             {!isLogin && (
               <div>
                 <label
                   htmlFor="name"
-                  className="block text-sm font-medium text-gray-700 mb-2"
+                  className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-2"
                 >
                   Full Name
                 </label>
@@ -119,107 +144,131 @@ const AuthPage = () => {
                   value={formData.name}
                   onChange={handleInputChange}
                   required={!isLogin}
-                  className="w-full h-12 px-4 border border-gray-300 rounded-lg text-base outline-none focus:border-teal focus:ring-2 focus:ring-teal/20 transition-all"
+                  className="
+                    w-full h-12 px-4 border border-gray-300 rounded-lg text-base outline-none
+                    text-gray-900 dark:text-dark-text
+                    placeholder:text-gray-400 dark:placeholder:text-gray-300
+                    focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20 transition-all
+                  "
                   placeholder="Enter your full name"
                   aria-label="Enter your full name"
                 />
               </div>
             )}
 
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Email Address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                required
-                className="w-full h-12 px-4 border border-gray-300 rounded-lg text-base outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20 transition-all"
-                placeholder="Enter your email"
-                aria-label="Enter your email address"
-              />
-            </div>
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-2"
+            >
+              Email Address
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              required
+              className="
+                w-full h-12 px-4 border border-gray-300 rounded-lg text-base outline-none
+                text-gray-900 dark:text-dark-text
+                placeholder:text-gray-400 dark:placeholder:text-gray-300
+                focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20 transition-all
+              "
+              placeholder="Enter your email"
+              aria-label="Enter your email address"
+            />
+          </div>
 
+          <div>
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-2"
+            >
+              Password
+            </label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleInputChange}
+              required
+              className="
+                w-full h-12 px-4 border border-gray-300 rounded-lg text-base outline-none
+                text-gray-900 dark:text-dark-text
+                placeholder:text-gray-400 dark:placeholder:text-gray-300
+                focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20 transition-all
+              "
+              placeholder="Enter your password"
+              aria-label="Enter your password"
+              minLength={6}
+            />
+          </div>
+
+          {!isLogin && (
             <div>
               <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-gray-700 dark:text-dark-text mb-2"
               >
-                Password
+                Confirm Password
               </label>
               <input
-                id="password"
-                name="password"
+                id="confirmPassword"
+                name="confirmPassword"
                 type="password"
-                value={formData.password}
+                value={formData.confirmPassword}
                 onChange={handleInputChange}
-                required
-                className="w-full h-12 px-4 border border-gray-300 rounded-lg text-base outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20 transition-all"
-                placeholder="Enter your password"
-                aria-label="Enter your password"
+                required={!isLogin}
+                className="
+                  w-full h-12 px-4 border border-gray-300 rounded-lg text-base outline-none
+                  text-gray-900 dark:text-dark-text
+                  placeholder:text-gray-400 dark:placeholder:text-gray-300
+                  focus:border-teal-600 focus:ring-2 focus:ring-teal-600/20 transition-all
+                "
+                placeholder="Confirm your password"
+                aria-label="Confirm your password"
                 minLength={6}
               />
             </div>
+          )}
 
-            {!isLogin && (
-              <div>
-                <label
-                  htmlFor="confirmPassword"
-                  className="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Confirm Password
-                </label>
+          {isLogin && (
+            <div className="flex items-center justify-between">
+              <label className="flex items-center">
                 <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  value={formData.confirmPassword}
-                  onChange={handleInputChange}
-                  required={!isLogin}
-                  className="w-full h-12 px-4 border border-gray-300 rounded-lg text-base outline-none focus:border-teal focus:ring-2 focus:ring-teal/20 transition-all"
-                  placeholder="Confirm your password"
-                  aria-label="Confirm your password"
-                  minLength={6}
+                  type="checkbox"
+                  className="w-4 h-4 text-teal border-gray-300 rounded focus:ring-teal"
+                  aria-label="Remember me"
                 />
-              </div>
-            )}
+                <span className="ml-2 text-sm text-gray-600 dark:text-dark-text">Remember me</span>
+              </label>
+              <a
+                href="#forgot-password"
+                className="text-sm text-teal hover:text-teal-dark font-medium"
+                aria-label="Forgot password"
+              >
+                Forgot password?
+              </a>
+            </div>
+          )}
 
-            {isLogin && (
-              <div className="flex items-center justify-between">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    className="w-4 h-4 text-teal border-gray-300 rounded focus:ring-teal"
-                    aria-label="Remember me"
-                  />
-                  <span className="ml-2 text-sm text-gray-600">Remember me</span>
-                </label>
-                <a
-                  href="#forgot-password"
-                  className="text-sm text-teal hover:text-teal-dark font-medium"
-                  aria-label="Forgot password"
-                >
-                  Forgot password?
-                </a>
-              </div>
-            )}
-
-            <button
-              type="submit"
-              className="w-full h-12 bg-teal text-white font-semibold text-lg rounded-lg shadow-[0_6px_18px_rgba(14,165,164,0.35)] transition-all hover:bg-teal-dark hover:shadow-[0_8px_22px_rgba(14,165,164,0.40)] hover:-translate-y-px focus:outline-none focus:ring-2 focus:ring-teal focus:ring-offset-2"
-              aria-label={isLogin ? 'Submit login form' : 'Submit signup form'}
-              tabIndex={0}
-            >
-              {isLogin ? 'Login' : 'Sign Up'}
-            </button>
+          <button
+            type="submit"
+            className="
+              w-full h-12 bg-teal-500 text-white font-semibold text-lg rounded-lg
+              shadow-[0_6px_18px_rgba(14,165,164,0.35)] transition-all
+              hover:bg-teal-dark hover:shadow-[0_8px_22px_rgba(14,165,164,0.40)]
+              hover:-translate-y-px focus:outline-none focus:ring-2 focus:ring-teal focus:ring-offset-2
+            "
+            aria-label={isLogin ? "Submit login form" : "Submit signup form"}
+            tabIndex={0}
+          >
+            {isLogin ? "Login" : "Sign Up"}
+          </button>
           </form>
-
           {/* Divider */}
           <div className="my-8 flex items-center">
             <div className="flex-1 border-t border-gray-300"></div>
@@ -231,7 +280,7 @@ const AuthPage = () => {
           <div className="space-y-3">
             <button
               type="button"
-              className="w-full h-12 border border-gray-300 rounded-lg font-medium text-gray-700 bg-white hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
+              className="w-full h-12 border border-gray-300 rounded-lg font-medium text-gray-700 dark:text-dark-text bg-white dark:bg-bg-primary-dark hover:bg-gray-50 dark:hover:bg-gray-800 transition-all cursor-pointer flex items-center justify-center gap-2"
               aria-label="Continue with Google"
               tabIndex={0}
             >
@@ -257,9 +306,12 @@ const AuthPage = () => {
             </button>
             <button
               type="button"
-              className="w-full h-12 border border-gray-300 rounded-lg font-medium text-gray-700 bg-white hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
+              className="w-full h-12 border border-gray-300 rounded-lg font-medium text-gray-700 dark:text-dark-text bg-white dark:bg-bg-primary-dark cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
               aria-label="Continue with GitHub"
               tabIndex={0}
+              onClick={() =>
+                window.location.href = "http://localhost:8081/oauth2/authorization/github"
+              }
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path
