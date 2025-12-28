@@ -14,9 +14,11 @@ const HistoryPage = () => {
   const [qrUrl, setQrUrl] = useState(null);
   const [showQrModal, setShowQrModal] = useState(false);
 
+  // Get short URL base from environment variable
+  const shortUrlBase = import.meta.env.VITE_SHORT_URL_BASE || "http://localhost:8081";
 
   const openQrModal = (url) => {
-    const qrApi = `http://api.qrserver.com/v1/create-qr-code/?size=250x250&data=http://localhost:8081/${url.shortKey}`;
+    const qrApi = `http://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${shortUrlBase}/${url.shortKey}`;
     setQrUrl(qrApi);
     setShowQrModal(true);
   };
@@ -39,7 +41,7 @@ const HistoryPage = () => {
   };
 
   const copyToClipboard = async (shortKey, id) => {
-    await navigator.clipboard.writeText(`http://localhost:8081/${shortKey}`);
+    await navigator.clipboard.writeText(`${shortUrlBase}/${shortKey}`);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 1500);
   };
@@ -103,11 +105,11 @@ const HistoryPage = () => {
                   <tr key={url.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer">
                     <td className="px-4 py-3 font-medium text-blue-600">
                       <a
-                        href={`http://localhost:8081/${url.shortKey}`}
+                        href={`${shortUrlBase}/${url.shortKey}`}
                         target="_blank"
                         rel="noreferrer"
                       >
-                        {`http://localhost:8081/${url.shortKey}`}
+                        {`${shortUrlBase}/${url.shortKey}`}
                       </a>
                     </td>
 

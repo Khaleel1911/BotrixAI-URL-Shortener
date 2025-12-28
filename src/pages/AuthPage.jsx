@@ -310,7 +310,7 @@ const AuthPage = () => {
               aria-label="Continue with GitHub"
               tabIndex={0}
               onClick={() =>
-                window.location.href = "http://localhost:8081/oauth2/authorization/github"
+                window.location.href = `${import.meta.env.VITE_OAUTH_BASE_URL || "http://localhost:8081"}/oauth2/authorization/github`
               }
             >
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
