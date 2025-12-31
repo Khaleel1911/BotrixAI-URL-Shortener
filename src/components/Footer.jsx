@@ -5,9 +5,12 @@ import { FaFacebookF, FaInstagram, FaWhatsapp } from "react-icons/fa";
 const Footer = () => {
   const navigate = useNavigate();
 
-  const handleGetStarted = () => {
-    navigate('/auth');
-  };
+ const handleGetStarted = () => {
+  navigate('/auth');
+  setTimeout(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 0);
+};
 
   return (
     <footer className="bg-teal-600 dark:bg-bg-primary-dark text-white py-14 px-7 font-sans antialiased" role="contentinfo">
@@ -116,7 +119,7 @@ const Footer = () => {
         {/* BOTTOM ROW: left text, centered icons, right text */}
         <div className="max-w-[1200px] mx-auto mt-4.5 pt-2 flex flex-wrap items-center justify-between gap-4 max-md:flex-col max-md:gap-4 max-md:text-center">
           <p className="m-0 text-white/70 font-normal text-sm order-1 max-md:order-3">
-            © 2025 URI Shortner. All rights reserved.
+            © 2025 BotrixAI - URL Shortener. All rights reserved.
           </p>
 
           <div className="flex gap-6 items-center justify-center order-2 max-md:order-1" role="navigation" aria-label="Social media links">
