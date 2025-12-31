@@ -1,6 +1,6 @@
 # 🔗 BotrixAI – URL Shortener (Frontend)
 
-A modern, responsive URL shortener web application built by **BotrixAI**. This React-based frontend provides secure authentication, AI-driven workflows, URL generation, history analytics, and a seamless user experience. The application communicates with a Spring Boot backend API.
+A modern, responsive URL shortener web application built by **BotrixAI**. This React-based frontend provides secure authentication,URL generation, history analytics, and a seamless user experience. The application communicates with a Spring Boot backend API.
 
 ---
 
