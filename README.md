@@ -22,7 +22,6 @@ A modern, responsive URL shortener web application built by **BotrixAI**. This R
 
 - **🔗 URL Shortening** - Generate short URLs instantly with a user-friendly interface
 - **🔐 Authentication** - Secure user authentication with login and signup functionality
-- **🧠 AI-Driven Flow** - Intelligent URL management powered by BotrixAI technology
 - **🛡️ Protected Routes** - Route protection ensuring only authenticated users can access sensitive pages
 - **📊 History & Analytics** - View URL history with detailed usage statistics
 - **📱 Responsive Design** - Fully responsive UI built with TailwindCSS
@@ -61,7 +60,7 @@ Before you begin, ensure you have the following installed:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/botrixai-url-shortener-frontend.git
+git clone https://github.com/khaleel1911/botrixai-url-shortener-frontend.git
 cd botrixai-url-shortener-frontend
 ```
 
